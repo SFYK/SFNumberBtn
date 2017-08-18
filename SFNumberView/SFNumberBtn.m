@@ -26,15 +26,17 @@
 }
 
 - (void)panAction:(UIPanGestureRecognizer *)pan {
+    //大圆随着手指移动
     CGPoint offSetPonit = [pan translationInView:self];
     CGPoint center = self.center;
     center.x += offSetPonit.x;
     center.y += offSetPonit.y;
     self.center = center;
     [pan setTranslation:CGPointZero inView:self];
-    
+    //获取两个圆心的距离
     CGFloat centerDistance = [self distanceWithBgView:self.bgView topView:self];
     
+    //计算小圆的半径
     CGFloat smallRadius = self.bounds.size.width/2 - centerDistance/10;
     
     self.bgView.bounds = CGRectMake(0, 0, smallRadius*2, smallRadius*2);
@@ -46,6 +48,7 @@
     }
     
     if (self.bgView.hidden == NO) {
+        // 设置path
         self.shapeLayer.path = [self pathWithBgView:self.bgView topView:self].CGPath;
     }
     
@@ -53,6 +56,7 @@
         if (centerDistance > 100) {
             [self disappearAnimation];
         }else {
+            // 复位
             [UIView animateWithDuration:0.25 delay:0 usingSpringWithDamping:0.1 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
                 self.center = self.bgView.center ;
             } completion:^(BOOL finished) {
@@ -63,7 +67,7 @@
         }
     }
 }
-
+// 消失动画
 - (void)disappearAnimation {
     self.bgView.hidden = YES;
     UIImageView * imageV = [[UIImageView alloc] initWithFrame:self.bounds];
@@ -118,15 +122,20 @@
     
     UIBezierPath *path = [UIBezierPath bezierPath];
     [path moveToPoint:pointA];
+    // A B
     [path addLineToPoint:pointB];
+    // B C
     [path addQuadCurveToPoint:pointC controlPoint:pointP];
+    // C D
     [path addLineToPoint:pointD];
+    // D A
     [path addQuadCurveToPoint:pointA controlPoint:pointO];
     
     return path;
     
 }
 
+// 计算两个圆心的距离
 - (CGFloat)distanceWithBgView:(UIView *)bgView topView:(UIView *)topView {
     CGFloat offsetx = topView.center.x - bgView.center.x;
     CGFloat offsety = topView.center.y - bgView.center.y;
@@ -141,7 +150,7 @@
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.titleLabel.font = [UIFont systemFontOfSize:12];
     
-    UIPanGestureRecognizer * pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panAction:)];
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panAction:)];
     pan.delegate = self;
     [self addGestureRecognizer:pan];
     
